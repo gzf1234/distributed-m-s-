@@ -138,15 +138,40 @@ import hashlib
 #
 #
 #
-a = b'nihao'
-b = str(a)
-c = a.decode()
-print(c)
-print(type(c))
-print(b)
+from pyquery import PyQuery as pq
+import requests
+#
+# url = 'http://www.cq.gov.cn/publicinfo/web/views/Show!detail.action?sid=4290481'
+# res = requests.get(url)
+#
+# doc = pq(res.text)
+# title = doc('.topicname').text()
+#
+# print(res.status_code)
+# print(title)
 
-print(a)
+import threading
+import time
 
-print(type(a))
-print(type(b))
+def test():
+    print('线程名字:', threading.current_thread().name)
+    print('休息10s')
+    time.sleep(10)
+
+threads = []
+while True:
+    # print('准备创建一个新的子线程.')
+    print('现在线程池中有%d 个线程' % len(threads))
+    for t in threads:
+        if not t.is_alive():
+           threads.remove(t)
+    if len(threads) >= 4:
+        print('线程池满了!')
+        time.sleep(4)
+        continue
+
+    t = threading.Thread(target=test)
+    threads.append(t)
+    t.start()
+    time.sleep(2)
 

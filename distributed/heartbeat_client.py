@@ -15,7 +15,7 @@ class HeartBeatClient(object):
     client_id = -1
     hb_period = 5
     skip_wait = False
-    socket_client = SocketClient('127.0.0.1', 9000)
+    socket_client = SocketClient('192.168.1.105', 9000)
 
     def __init__(self):
         self.run_heartbeat = True

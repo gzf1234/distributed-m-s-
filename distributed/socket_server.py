@@ -9,7 +9,7 @@ import threading
 import signal
 
 class ServerSocket(object):
-    def __init__(self, callback, host='127.0.0.1', port=9000):
+    def __init__(self, callback, host='0.0.0.0', port=9000):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.callback = callback
 

@@ -9,7 +9,7 @@ import hashlib
 import datetime
 
 class MongoRedisUrlManager:
-    def __init__(self, server_ip='localhost', client=None, expires=timedelta(days=30)):
+    def __init__(self, server_ip='192.168.1.105', client=None, expires=timedelta(days=30)):
         self.client = MongoClient(server_ip, 27017) if client is None else client
         self.redis_client = redis.StrictRedis(host=server_ip, port=6379, db=0)
 
@@ -29,15 +29,24 @@ class MongoRedisUrlManager:
         for record in records:
             ids.append(record['_id'])
             urls.append(record['url'])
+            self.db.locations.update(
+                {
+                    '_id': record['_id']
+                },
+                {
+                    '$set': {'status': 'downloading'}
+                }
+            )
 
-        self.db.locations.update(
-            {
-                '_id': {'$in': ids}
-            },
-            {
-                '$set': {'status': 'downloading'}
-            }
-        )
+        # self.db.locations.update(
+        #     {
+        #         '_id': {'$in': ids}
+        #     },
+        #     {
+        #         '$set': {'status': 'downloading'}
+        #     }
+        # )
+
 
         if records is None:
             return None

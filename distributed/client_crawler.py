@@ -2,10 +2,9 @@
 #user:gzf
 
 import protocol_constants as pc
-from socket_client import SocketClient
 from mongo_redis_mgr import MongoRedisUrlManager
 from heartbeat_client import HeartBeatClient
-from settings import MAX_NUM_THREAD, MAX_PAGE_NUM, ROOT_URL, BASE_URL
+from settings import MAX_NUM_THREAD, MAX_PAGE_NUM, ROOT_URL, BASE_URL, START_ROOT_PAGE
 
 import json
 import time
@@ -19,7 +18,7 @@ from pyquery import PyQuery as pq
 def get_page_content(is_root_page=False):
     # 先获取所有详情页的url
     if is_root_page is True:
-        for page_num in range(1, MAX_PAGE_NUM):
+        for page_num in range(START_ROOT_PAGE, MAX_PAGE_NUM):
             url = ROOT_URL.format(str(page_num))
             res = requests.get(url)
             res.encoding = 'utf-8'
@@ -31,26 +30,28 @@ def get_page_content(is_root_page=False):
                 urls.append(new_url)
             print('获取新的待爬取url:', urls)
             HBC.finish_target_urls(urls)
-
-    #  开始抓取详情页的信息
-    curtask = HBC.get_target_urls() #  type(curtask) = dict
-    crawl_delay = curtask.get(pc.CRAWL_DELAY)
-    urls = curtask.get(pc.DATA)
-    if urls is None:
-        time.sleep(5)
-    if crawl_delay is not None:
-        sleep_time = crawl_delay
     else:
-        sleep_time = 0
-    for url in urls:
-        res = requests.get(url)
-        doc = pq(res.text)
-        content = str(doc('.content'))
-        print(type(content))
-        with open('content.txt', 'w+', encoding='utf-8') as f:
-            f.write(content)
-        print('抓取url: ', url)
-        time.sleep(sleep_time)
+        #  开始抓取详情页的信息
+        print('#'*15)
+        print('进入一个新的爬虫线程')
+        print('#'*15)
+        curtask = HBC.get_target_urls() #  type(curtask) = dict
+        crawl_delay = curtask.get(pc.CRAWL_DELAY)
+        urls = curtask.get(pc.DATA)
+        if urls is None:
+            time.sleep(5)
+        if crawl_delay is not None:
+            sleep_time = crawl_delay
+        else:
+            sleep_time = 0
+        for url in urls:
+            res = requests.get(url)
+            doc = pq(res.text)
+            title = doc('.topicname').text()
+            with open('content.txt', 'a+', encoding='utf-8') as f:
+                f.write(title + '\n')
+            print('抓取url: ', url)
+            time.sleep(sleep_time)
 
 
 HBC = HeartBeatClient() # create a TCP/IP socket

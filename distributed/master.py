@@ -50,6 +50,7 @@ class CrawlMaster(object):
             return json.dumps(response)
         elif type == pc.LOCATIONS:
             crawl_urls = self.dbmanager.dequeueUrls(size=pc.REQUEST_SIZE)
+            print(crawl_urls)
             response[pc.MSG_TYPE] = pc.LOCATIONS
             response[pc.CRAWL_DELAY] = pc.CRAWL_DELAY_TIME
             response[pc.DATA] = crawl_urls
